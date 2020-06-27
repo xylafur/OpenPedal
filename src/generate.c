@@ -78,10 +78,10 @@ static status_t calc_vals(uint32_t pwm_freq, uint32_t* prescale, uint32_t* perio
 
     /* Find prescale value such that the pwm_freq can be acieved */
     /* Using: fpwm = (fclk / ( (ARR + 1) ( PSC + 1)) */
-    while (*period > ARR_MAX) {
+    do {
         *prescale = *prescale == 0xdeadbeef ? 0 : *prescale + 1;
         *period = fclk / (pwm_freq / (*prescale + 1)) - 1;
-    }
+    } while (*period > ARR_MAX);
 
     if (*prescale >= PRESCALE_MAX) {
         return STATUS_ERROR;
@@ -108,7 +108,7 @@ void init_pins(void)
  */
 status_t init_timer(uint32_t pwm_freq, uint32_t* period) {
     status_t st;
-    uint32_t prescale;
+    uint32_t prescale = 0;
 
     st = calc_vals(pwm_freq, &prescale, period);
     if (FAIL(st)) {
