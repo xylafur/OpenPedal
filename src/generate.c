@@ -10,6 +10,7 @@ uint32_t global_period;
 #define ARR_MAX 0xFFFF
 #define PRESCALE_MAX 0xFFFF
 #define CCR_MAX 0xFFFF
+#define MAX_DUTY 256
 
 /******************************************************************************
  * Private Prototypes
@@ -20,6 +21,9 @@ status_t init_timer(uint32_t pwm_freq, uint32_t* period);
 /******************************************************************************
  * Public
  *****************************************************************************/
+uint32_t amplitude_to_duty(uint32_t val, uint32_t max) {
+    return val * MAX_DUTY / max;
+}
 
 /*  Initializes PWM for the given frequency / duty cycle on timer 3 channel 1
  *
@@ -55,7 +59,6 @@ status_t init_pwm(uint32_t pwm_freq)
     return STATUS_SUCCESS;
 }
 
-#define MAX_DUTY 256
 status_t pwm_ch_duty(uint32_t duty) {
     uint32_t period = global_period;
 
