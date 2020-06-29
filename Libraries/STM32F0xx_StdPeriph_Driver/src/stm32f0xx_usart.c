@@ -377,7 +377,7 @@ void USART_Cmd(USART_TypeDef* USARTx, FunctionalState NewState)
   /* Check the parameters */
   assert_param(IS_USART_ALL_PERIPH(USARTx));
   assert_param(IS_FUNCTIONAL_STATE(NewState));
-  
+
   if (NewState != DISABLE)
   {
     /* Enable the selected USART by setting the UE bit in the CR1 register */
@@ -858,8 +858,8 @@ void USART_SendData(USART_TypeDef* USARTx, uint16_t Data)
 {
   /* Check the parameters */
   assert_param(IS_USART_ALL_PERIPH(USARTx));
-  assert_param(IS_USART_DATA(Data)); 
-    
+  assert_param(IS_USART_DATA(Data));
+
   /* Transmit Data */
   USARTx->TDR = (Data & (uint16_t)0x01FF);
 }

@@ -1,33 +1,41 @@
+#include "cli.h"
+
 #include "stm32f0xx_usart.h"
 #include <stdio.h>
 
-#ifdef __GNUC__
-  /* With GCC/RAISONANCE, small printf (option LD Linker->Libraries->Small printf
-     set to 'Yes') calls __io_putchar() */
-  #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
-#else
-  #define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
-#endif /* __GNUC__ */
-
+#define BAUD_RATE 9600
 
 void init_usart() {
-    USART_InitTypeDef USART_InitStructure;
+    USART_InitTypeDef USART_InitStructure = {
+        .USART_BaudRate = BAUD_RATE,
+        .USART_WordLength = USART_WordLength_8b,
+        .USART_StopBits = USART_StopBits_1,
+        .USART_Parity = USART_Parity_No,
+        .USART_HardwareFlowControl = USART_HardwareFlowControl_None,
+        .USART_Mode = USART_Mode_Rx | USART_Mode_Tx,
+    };
 
-    USART_InitStructure.USART_BaudRate = 115200;
-    USART_InitStructure.USART_WordLength = USART_WordLength_8b;
-    USART_InitStructure.USART_StopBits = USART_StopBits_1;
-    USART_InitStructure.USART_Parity = USART_Parity_No;
-    USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-    USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+    /* Setup the GPIO pins for alternate function, Pull Up */
+    GPIO_InitTypeDef gpioStructure  = {
+        .GPIO_Mode = GPIO_Mode_AF,
+        .GPIO_Speed = GPIO_Speed_50MHz,
+        .GPIO_Pin = GPIO_Pin_2 | GPIO_Pin_3,
+        .GPIO_OType = GPIO_OType_PP,
+        .GPIO_PuPd = GPIO_PuPd_UP,
+    };
 
-    USART_Init(USART1, &USART_InitStructure);
+    /* Enable AHB and APB clocks */
+    RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
 
-    /* Output a message on Hyperterminal using printf function */
-    printf("\n\rUSART Printf Example: retarget the C library printf function to the USART\n\r");
+    /* Configure PA2 and PA3 as USART */
+    GPIO_PinAFConfig(GPIOA, GPIO_PinSource2, GPIO_AF_1);
+    GPIO_PinAFConfig(GPIOA, GPIO_PinSource3, GPIO_AF_1);
 
-    /* Loop until the end of transmission */
-    /* The software must wait until TC=1. The TC flag remains cleared during all data
-       transfers and it is set by hardware at the last frames end of transmission*/
-    while (USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET)
-    {}
+    GPIO_Init(GPIOA, &gpioStructure);
+    USART_Init(USART2, &USART_InitStructure);
+
+    USART_Cmd(USART2,ENABLE);
+
+    printf("\r\n\rInitializing CLI...\n\r");
 }

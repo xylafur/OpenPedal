@@ -133,3 +133,5 @@ status_t init_timer(uint32_t pwm_freq, uint32_t* period) {
 
     return STATUS_SUCCESS;
 }
+
+

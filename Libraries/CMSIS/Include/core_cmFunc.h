@@ -434,7 +434,6 @@ __attribute__( ( always_inline ) ) static __INLINE uint32_t __get_MSP(void)
   __ASM volatile ("MRS %0, msp\n" : "=r" (result) );
   return(result);
 }
- 
 
 /** \brief  Set Main Stack Pointer
 

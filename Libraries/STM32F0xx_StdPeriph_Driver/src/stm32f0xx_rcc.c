@@ -1139,8 +1139,8 @@ void RCC_BackupResetCmd(FunctionalState NewState)
 /**
   * @brief  Enables or disables the AHB peripheral clock.
   * @note   After reset, the peripheral clock (used for registers read/write access)
-  *         is disabled and the application software has to enable this clock before 
-  *         using it.    
+  *         is disabled and the application software has to enable this clock before
+  *         using it.
   * @param  RCC_AHBPeriph: specifies the AHB peripheral to gates its clock.
   *          This parameter can be any combination of the following values:
   *             @arg RCC_AHBPeriph_GPIOA: GPIOA clock
@@ -1150,7 +1150,7 @@ void RCC_BackupResetCmd(FunctionalState NewState)
   *             @arg RCC_AHBPeriph_GPIOF: GPIOF clock
   *             @arg RCC_AHBPeriph_TS:    TS clock
   *             @arg RCC_AHBPeriph_CRC:   CRC clock
-  *             @arg RCC_AHBPeriph_FLITF: (has effect only when the Flash memory is in power down mode)  
+  *             @arg RCC_AHBPeriph_FLITF: (has effect only when the Flash memory is in power down mode) 
   *             @arg RCC_AHBPeriph_SRAM:  SRAM clock
   *             @arg RCC_AHBPeriph_DMA1:  DMA1 clock
   * @param  NewState: new state of the specified peripheral clock.
@@ -1212,7 +1212,7 @@ void RCC_APB2PeriphClockCmd(uint32_t RCC_APB2Periph, FunctionalState NewState)
 /**
   * @brief  Enables or disables the Low Speed APB (APB1) peripheral clock.
   * @note   After reset, the peripheral clock (used for registers read/write access)
-  *         is disabled and the application software has to enable this clock before 
+  *         is disabled and the application software has to enable this clock before
   *         using it.
   * @param  RCC_APB1Periph: specifies the APB1 peripheral to gates its clock.
   *          This parameter can be any combination of the following values:
@@ -1227,7 +1227,7 @@ void RCC_APB2PeriphClockCmd(uint32_t RCC_APB2Periph, FunctionalState NewState)
   *           @arg RCC_APB1Periph_I2C2:   I2C2 clock
   *           @arg RCC_APB1Periph_PWR:    PWR clock
   *           @arg RCC_APB1Periph_DAC:    DAC clock
-  *           @arg RCC_APB1Periph_CEC:    CEC clock                               
+  *           @arg RCC_APB1Periph_CEC:    CEC clock
   * @param  NewState: new state of the specified peripheral clock.
   *          This parameter can be: ENABLE or DISABLE.
   * @retval None
