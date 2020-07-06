@@ -33,6 +33,7 @@ CFLAGS += -mlittle-endian -mcpu=cortex-m0  -march=armv6-m -mthumb
 CFLAGS += -ffunction-sections -fdata-sections
 CFLAGS += -Wl,--gc-sections -Wl,-Map=$(PROJ_NAME).map
 CFLAGS += -Wdouble-promotion -Werror -Wundef
+CFLAGS += --specs=nano.specs
 
 ###################################################
 
