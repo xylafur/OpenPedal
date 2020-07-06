@@ -1,8 +1,9 @@
 # put your *.o targets here, make should handle the rest!
-SRCS = main.c cli.c generate.c transform.c syscalls.c system_stm32f0xx.c
+SRCS = main.c cli.c generate.c transform.c system_stm32f0xx.c
+SRCS += core/logger.c core/syscalls.c
 
 # all the files will be generated with this name (main.elf, main.bin, main.hex, etc)
-PROJ_NAME=main
+PROJ_NAME=open_pedal
 
 # Location of the Libraries folder from the STM32F0xx Standard Peripheral Library
 STD_PERIPH_LIB=Libraries
@@ -31,6 +32,7 @@ CFLAGS  = -Wall -g -std=c99 -Os
 CFLAGS += -mlittle-endian -mcpu=cortex-m0  -march=armv6-m -mthumb
 CFLAGS += -ffunction-sections -fdata-sections
 CFLAGS += -Wl,--gc-sections -Wl,-Map=$(PROJ_NAME).map
+CFLAGS += -Wdouble-promotion -Werror -Wundef
 
 ###################################################
 

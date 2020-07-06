@@ -1,6 +1,7 @@
 *.sw*
 *.un*
 *.a
+*.o
 *.bin
 *.elf
 *.lst
