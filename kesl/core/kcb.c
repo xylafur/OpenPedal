@@ -27,9 +27,10 @@
  *             0  1  2  3  4  5  6  7  8  9
  *
  */
-#include "buffer.h"
-
 #include <string.h>
+#include <stdio.h>
+
+#include "kcb.h"
 
 /*
  *  Initializes the given KCB
@@ -214,4 +215,33 @@ status_t kcb_write (kcb_t* buf, uint32_t val) {
     buf->write = (buf->write + 1) % buf->size;
 
     return STATUS_SUCCESS;
+}
+
+
+/*
+ *  Print out information about a KCB.
+ *
+ *  verbose (IN) Print out all of the entries?
+ */
+void kcb_print(kcb_t* buf, uint32_t verbose) {
+    uint32_t read, jj;
+    printf("Read Pointer: %lu\n", buf->read);
+    printf("Write Pointer: %lu\n", buf->write);
+    printf("Buffer Size: %lu\n", buf->size);
+
+    if (verbose) {
+        read = buf->read;
+        while (read < buf->write) {
+            #define VALS_PER_LINE 5
+            for (jj = 0; jj < VALS_PER_LINE; jj++) {
+                printf("%lu: %lu ", jj, buf->buf[read++]);
+                if (read >= buf->write) {
+                    break;
+                }
+            }
+            #undef VALS_PER_LINE
+            printf("\n");
+        }
+
+    }
 }

@@ -60,4 +60,6 @@ status_t kcb_read_many (kcb_t* buf, uint32_t start_idx, uint32_t count, uint32_t
 
 status_t kcb_write (kcb_t* buf, uint32_t val);
 
+void kcb_print(kcb_t* buf, uint32_t verbose);
+
 #endif
