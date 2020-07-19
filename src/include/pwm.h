@@ -4,7 +4,7 @@
 #include "core.h"
 
 status_t pwm_ch_duty(uint32_t duty);
-status_t init_pwm(uint32_t pwm_freq);
-uint32_t amplitude_to_duty(uint32_t val, uint32_t max);
+status_t pwm_init(uint32_t pwm_freq);
+uint32_t pwm_convert_value(uint32_t val, uint32_t max);
 
 #endif

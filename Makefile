@@ -8,6 +8,8 @@ SIZE=arm-none-eabi-size
 SRCS = main.c
 SRCS += cli.c
 SRCS += transform/transform.c
+
+SRCS += output/output.c
 SRCS += output/pwm.c
 
 # Kesl Core

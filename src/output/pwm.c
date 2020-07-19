@@ -25,7 +25,16 @@ status_t init_timer(uint32_t pwm_freq, uint32_t* period);
 /******************************************************************************
  * Public
  *****************************************************************************/
-uint32_t amplitude_to_duty(uint32_t val, uint32_t max) {
+/*
+ *  Convert the given value into a range that the PWM module will accept.
+ *
+ *  val (IN) The value we are converting
+ *  max (IN) The max value that val can take
+ *
+ *  We assume that the input val can range from [0, max], so we convert this
+ *  into the range [0, PWM_MAX]
+ */
+uint32_t pwm_convert_value(uint32_t val, uint32_t max) {
     return val * MAX_DUTY / max;
 }
 
@@ -33,7 +42,7 @@ uint32_t amplitude_to_duty(uint32_t val, uint32_t max) {
  *
  *  Timer 3 Channel 1 coresponds to PB4
  */
-status_t init_pwm(uint32_t pwm_freq)
+status_t pwm_init(uint32_t pwm_freq)
 {
     status_t st;
     uint32_t period;
@@ -79,6 +88,15 @@ status_t pwm_ch_duty(uint32_t duty) {
 /******************************************************************************
  * Private
  *****************************************************************************/
+
+/*
+ *  Determine the prescale and period values to achieve the given pwm frequency
+ *
+ *  prescale    (OUT) The value to use for the PWM prescale
+ *  period      (OUT) The value to use for the PWM period
+ *
+ *  returns status_t, was this pwm frequency achievable?
+ */
 static status_t calc_vals(uint32_t pwm_freq, uint32_t* prescale, uint32_t* period) {
     const uint32_t fclk = SystemCoreClock;
     *prescale = 0xdeadbeef;
@@ -97,6 +115,10 @@ static status_t calc_vals(uint32_t pwm_freq, uint32_t* prescale, uint32_t* perio
     return STATUS_SUCCESS;
 }
 
+/*
+ *  Initialize the GPIO pins for the output.  Set them up for their alternate
+ *  function (PWM)
+ */
 void init_pins(void)
 {
     RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOB, ENABLE);
@@ -137,5 +159,3 @@ status_t init_timer(uint32_t pwm_freq, uint32_t* period) {
 
     return STATUS_SUCCESS;
 }
-
-

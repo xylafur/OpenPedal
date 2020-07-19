@@ -36,7 +36,7 @@ int main(void)
         DEBUG();
     }
 
-    st = init_pwm(SystemCoreClock/10);
+    st = pwm_init(SystemCoreClock/10);
     if (FAIL(st)){
         DEBUG();
     }
