@@ -8,6 +8,7 @@ typedef uint32_t status_t;
 
 #define STATUS_SUCCESS 0
 #define STATUS_ERROR 1
+#define STATUS_RESOURCE_UNAVALIABLE 2
 
 #define SUCCESS(st) (st == STATUS_SUCCESS)
 #define FAIL(st) (st != STATUS_SUCCESS)
