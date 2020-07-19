@@ -1,31 +1,28 @@
-# put your *.o targets here, make should handle the rest!
-SRCS = main.c cli.c generate.c transform.c system_stm32f0xx.c
-SRCS += core/logger.c core/syscalls.c
-
-# all the files will be generated with this name (main.elf, main.bin, main.hex, etc)
-PROJ_NAME=open_pedal
-
-# Location of the Libraries folder from the STM32F0xx Standard Peripheral Library
-STD_PERIPH_LIB=Libraries
-
-# Location of the linker scripts
-LDSCRIPT_INC=Device/ldscripts
-
-# location of OpenOCD Board .cfg files (only used with 'make program')
-OPENOCD_BOARD_DIR=/usr/share/openocd/scripts/board
-
-# Configuration (cfg) file containing programming directives for OpenOCD
-OPENOCD_PROC_FILE=extra/stm32f0-openocd.cfg
-
-# that's it, no need to change anything below this line!
-
-###################################################
-
 CC=arm-none-eabi-gcc
 OBJCOPY=arm-none-eabi-objcopy
 OBJDUMP=arm-none-eabi-objdump
 GDB=arm-none-eabi-gdb
 SIZE=arm-none-eabi-size
+
+# Main Project
+SRCS = cli.c main.c
+SRCS += transform/transform.c
+SRCS += output/pwm.c
+# Kesl
+SRCS += kesl/core/logger.c kesl/core/syscalls.c
+SRCS += kesl/mpu/stm32f0/system_stm32f0xx.c
+SRCS += ./kesl/mpu/stm32f0/startup_stm32f0xx.s
+
+PROJ_NAME=open_pedal
+
+KESL=./kesl
+
+STD_PERIPH_LIB=$(KESL)/lib/stm32f0
+
+LDSCRIPT_INC=$(KESL)/mpu/stm32f0/ldscripts
+
+OPENOCD_BOARD_DIR=/usr/share/openocd/scripts/board
+OPENOCD_PROC_FILE=extra/stm32f0-openocd.cfg
 
 CFLAGS  = -Wall -g -std=c99 -Os
 #CFLAGS += -mlittle-endian -mthumb -mcpu=cortex-m0 -march=armv6s-m
@@ -35,22 +32,27 @@ CFLAGS += -Wl,--gc-sections -Wl,-Map=$(PROJ_NAME).map
 CFLAGS += -Wdouble-promotion -Werror -Wundef
 CFLAGS += --specs=nano.specs
 
-###################################################
-
 vpath %.c src
 vpath %.a $(STD_PERIPH_LIB)
 
 ROOT=$(shell pwd)
 
-CFLAGS += -I inc -I $(STD_PERIPH_LIB) -I $(STD_PERIPH_LIB)/CMSIS/Device/ST/STM32F0xx/Include
-CFLAGS += -I $(STD_PERIPH_LIB)/CMSIS/Include -I $(STD_PERIPH_LIB)/STM32F0xx_StdPeriph_Driver/inc
-CFLAGS += -include $(STD_PERIPH_LIB)/stm32f0xx_conf.h
+CFLAGS +=   -I $(KESL)/lib/
+CFLAGS +=   -I $(STD_PERIPH_LIB)
+CFLAGS +=   -I $(STD_PERIPH_LIB)/STM32F0xx_StdPeriph_Driver/include/
+CFLAGS +=   -I $(STD_PERIPH_LIB)/CMSIS/Device/ST/STM32F0xx/include/
+CFLAGS +=   -I $(KESL)/lib/stm32f0/CMSIS/include/
+CFLAGS +=   -I $(KESL)/include/
+CFLAGS +=   -I ./src/include/
 
-SRCS += Device/startup_stm32f0xx.s # add startup file to build
 
-# need if you want to build with -DUSE_CMSIS
-#SRCS += stm32f0_discovery.c
-#SRCS += stm32f0_discovery.c stm32f0xx_it.c
+#CFLAGS += -I src/include
+#CFLAGS += -I kesl/include
+#CFLAGS += -I $(STD_PERIPH_LIB)
+#CFLAGS += -I $(STD_PERIPH_LIB)/CMSIS/Device/ST/STM32F0xx/Include
+#CFLAGS += -I $(STD_PERIPH_LIB)/CMSIS/Include
+#CFLAGS += -I $(STD_PERIPH_LIB)/STM32F0xx_StdPeriph_Driver/inc
+#CFLAGS += -I $(STD_PERIPH_LIB)/stm32f0xx_conf.h
 
 OBJS = $(SRCS:.c=.o)
 

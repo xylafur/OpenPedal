@@ -2,6 +2,7 @@
 #define __TRANSFORM_HEADER__
 
 #include "core.h"
+#include <stdint.h>
 
 typedef enum {
     TRANSFORM_CONSTANT,

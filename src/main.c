@@ -3,7 +3,7 @@
 #include "stm32f0xx_conf.h"
 
 #include "core.h"
-#include "generate.h"
+#include "pwm.h"
 #include "transform.h"
 #include "cli.h"
 
@@ -18,19 +18,10 @@ void SysTick_Handler(void) {
     do_change = 1;
 }
 
-size_t get_string(char * str, uint32_t bytes) {
-    uint32_t ii;
-    char c;
-    for (ii = 0; ii < bytes ; ii++) {
-        c = fgetc(stdin);
-    }
-    return ii;
-}
-
 int main(void)
 {
     status_t st;
-    uint32_t newval, max = 0, val = 0, ii;
+    uint32_t val = 0, ii = 0;
     uint32_t systick_clicks = SystemCoreClock / SYSTICK_FREQ;
 
     init_usart();
@@ -44,8 +35,6 @@ int main(void)
     if (FAIL(st)){
         DEBUG();
     }
-
-    max = get_max_value();
 
     st = init_pwm(SystemCoreClock/10);
     if (FAIL(st)){

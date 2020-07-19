@@ -1,6 +1,11 @@
 # Open Pedal
 Open Source implementation of a Digital Guitar Effects Pedal.
 
+## Building
+You need the ARM GNU toolchain.  The file `install.sh` will download the 2020q2
+version of the toolchain from ARM's website as a tarball, uncompress it and
+move the binaries to somewhere they can be executed.
+
 ## Loading the image on the board
 
 If you have OpenOCD installed 'make program' can be used to flash the .bin file to the board. OpenOCD must be installed with stlink enabled.

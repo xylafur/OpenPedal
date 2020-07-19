@@ -1,6 +1,9 @@
 #ifndef __CORE_HEADER__
 #define __CORE_HEADER__
 
+#include <stdint.h>
+#include "stm32f0xx.h"
+
 typedef uint32_t status_t;
 
 #define STATUS_SUCCESS 0

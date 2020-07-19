@@ -1,5 +1,13 @@
 #include "core.h"
 #include <stdio.h>
+#include <stdint.h>
+
+#define LOG_LEVEL_ERROR 0
+#define LOG_LEVEL_WARN 1
+#define LOG_LEVEL_INFO 2
+
+#define LOG_INTELLIGENT 0
+#define LOG_UNINTELLIGENT 1
 
 
 uint32_t log_level = LOG_LEVEL_ERROR;
