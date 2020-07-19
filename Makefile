@@ -5,11 +5,17 @@ GDB=arm-none-eabi-gdb
 SIZE=arm-none-eabi-size
 
 # Main Project
-SRCS = cli.c main.c
+SRCS = main.c
+SRCS += cli.c
 SRCS += transform/transform.c
 SRCS += output/pwm.c
-# Kesl
-SRCS += kesl/core/logger.c kesl/core/syscalls.c
+
+# Kesl Core
+SRCS += kesl/core/logger.c
+SRCS += kesl/core/syscalls.c
+SRCS += kesl/core/kcb.c
+
+# Kesl Library / System Config / Startup
 SRCS += kesl/mpu/stm32f0/system_stm32f0xx.c
 SRCS += ./kesl/mpu/stm32f0/startup_stm32f0xx.s
 

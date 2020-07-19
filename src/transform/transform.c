@@ -35,8 +35,6 @@ uint32_t SIN_TABLE [BUFFER_DEPTH] = {
 /******************************************************************************
  * Private Prototypes
  *****************************************************************************/
-status_t check_buffer();
-status_t buffer_full();
 status_t get_constant_value(uint32_t* val);
 
 /******************************************************************************
@@ -65,32 +63,6 @@ status_t get_value(uint32_t* val) {
     return STATUS_SUCCESS;
 }
 
-status_t read_buffer(uint32_t* val) {
-    if (FAIL(check_buffer())) {
-        return STATUS_ERROR;
-    }
-
-    if (val == 0) {
-        return STATUS_ERROR;
-    }
-
-    *val = buffer[buffer_read];
-    buffer_read = (buffer_read + 1) % BUFFER_DEPTH;
-
-    return STATUS_SUCCESS;
-}
-
-status_t write_buffer(uint32_t val) {
-    if (SUCCESS(buffer_full())) {
-        return STATUS_ERROR;
-    }
-
-    buffer[buffer_write] = val;
-    buffer_write = (buffer_write + 1) % BUFFER_DEPTH;
-
-    return STATUS_SUCCESS;
-}
-
 uint32_t get_max_value() {
     if (transform_type == TRANSFORM_CONSTANT) {
         return 256;
@@ -103,18 +75,6 @@ uint32_t get_max_value() {
 /******************************************************************************
  * Private
  *****************************************************************************/
-/*  Is there room to put something into the buffer
- */
-status_t check_buffer() {
-    return buffer_read != buffer_write ? STATUS_SUCCESS : STATUS_ERROR;
-}
-
-/*  Return's STATUS_SUCCESS if the buffer is full, STATUS_ERROR otherwise
- */
-status_t buffer_full() {
-    return ((buffer_write + 1) % BUFFER_DEPTH) == buffer_read ? STATUS_SUCCESS : STATUS_ERROR;
-}
-
 status_t get_constant_value(uint32_t* val) {
     static uint32_t ii = 0;
     static uint32_t jj = 0;
