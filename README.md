@@ -7,8 +7,38 @@ version of the toolchain from ARM's website as a tarball, uncompress it and
 move the binaries to somewhere they can be executed.
 
 ## Loading the image on the board
-
 If you have OpenOCD installed 'make program' can be used to flash the .bin file to the board. OpenOCD must be installed with stlink enabled.
+
+# Architecture
+The pedal is designed in such a way that various different transformations can
+be applied to the incoming signal.
+
+There are three threads of execution.  Input, Output and Transform.
+
+The Input thread is triggered with by a timer (in the case of synthesized
+input) or by the ADC (in the case of sampling a real input signal through the ADC).
+
+The Output thread is triggered by a timer.  Whenever there is a valid  output value
+the output thread will start generating that value using PWM.
+
+The Transform thread is ran from the main loop.  If there is data sitting in
+the input buffer, it will move it into the transform buffer.  If there is
+enough data in the transform buffer, it will perform the currently assigned
+transformation and put the output into the output buffer.  The main loop will
+do other things such as read from the CLI.
+
+## Datapath
+Input Source -> Input Buffer -> Transform Buffer ->
+Transform is Applied -> Output Buffer -> Output Source
+
+## Input and Output Sources
+The output source (PWM) is expected to be connected to an external amplifier.
+For my testing I use a standard Guitar Amplifier.
+
+The input source is expected to just be the ground and data from a standard
+guitar / music cable.  Though there is also an option to synthesize the input.
+Currently you are only able to synthesize a constant tone.
+
 
 
 # Thank You
