@@ -16,6 +16,7 @@ SRCS += output/pwm.c
 SRCS += kesl/core/logger.c
 SRCS += kesl/core/syscalls.c
 SRCS += kesl/core/kcb.c
+SRCS += kesl/core/timer.c
 
 # Kesl Library / System Config / Startup
 SRCS += kesl/mpu/stm32f0/system_stm32f0xx.c

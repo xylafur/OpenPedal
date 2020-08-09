@@ -50,17 +50,17 @@ status_t kcb_init (kcb_t *buf, uint32_t size) {
 }
 
 /*
- * Returns STATUS_SUCCESS if the buffer is empty.  STATUS_ERROR otherwise
+ * returns 1 if the buffer is empty, 0 otherwise
  */
-status_t kcb_empty (kcb_t* buf) {
-    return buf->read == buf->write ? STATUS_SUCCESS : STATUS_ERROR;
+uint32_t kcb_empty (kcb_t* buf) {
+    return buf->read == buf->write ? 1 : 0;
 }
 
 /*
- * Returns STATUS_SUCCESS if the buffer is full.  STATUS_ERROR otherwise
+ * returns 1 if buffer is full, 0 otherwise
  */
-status_t kcb_full (kcb_t* buf) {
-    return ((buf->write +1) % buf->size) == buf->read ? STATUS_SUCCESS : STATUS_ERROR;
+uint32_t kcb_full (kcb_t* buf) {
+    return ((buf->write +1) % buf->size) == buf->read ? 1 : 0;
 }
 
 /*
@@ -206,7 +206,7 @@ status_t kcb_pop (kcb_t* buf, uint32_t* val) {
  * otherwise
  */
 status_t kcb_write (kcb_t* buf, uint32_t val) {
-    if FAIL(kcb_full (buf)) {
+    if ( kcb_full(buf) ) {
         return STATUS_ERROR;
     }
 
@@ -225,9 +225,9 @@ status_t kcb_write (kcb_t* buf, uint32_t val) {
  */
 void kcb_print(kcb_t* buf, uint32_t verbose) {
     uint32_t read, jj;
-    printf("Read Pointer: %lu\n", buf->read);
-    printf("Write Pointer: %lu\n", buf->write);
-    printf("Buffer Size: %lu\n", buf->size);
+    printf("Read Pointer: %lu\n\r", buf->read);
+    printf("Write Pointer: %lu\n\r", buf->write);
+    printf("Buffer Size: %lu\n\r", buf->size);
 
     if (verbose) {
         read = buf->read;
@@ -240,7 +240,7 @@ void kcb_print(kcb_t* buf, uint32_t verbose) {
                 }
             }
             #undef VALS_PER_LINE
-            printf("\n");
+            printf("\n\r");
         }
 
     }

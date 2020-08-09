@@ -1,0 +1,4 @@
+PWM     -       - PB.4
+
+USART   -   RX  - PA.2
+USART   -   TX  - PA.3

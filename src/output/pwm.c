@@ -5,14 +5,14 @@
 
 #include "pwm.h"
 
+#include "timer.h"
+
 /******************************************************************************
  * Globals
  *****************************************************************************/
 
 uint32_t global_period;
 
-#define ARR_MAX 0xFFFF
-#define PRESCALE_MAX 0xFFFF
 #define CCR_MAX 0xFFFF
 #define MAX_DUTY 256
 
@@ -89,31 +89,7 @@ status_t pwm_ch_duty(uint32_t duty) {
  * Private
  *****************************************************************************/
 
-/*
- *  Determine the prescale and period values to achieve the given pwm frequency
- *
- *  prescale    (OUT) The value to use for the PWM prescale
- *  period      (OUT) The value to use for the PWM period
- *
- *  returns status_t, was this pwm frequency achievable?
- */
-static status_t calc_vals(uint32_t pwm_freq, uint32_t* prescale, uint32_t* period) {
-    const uint32_t fclk = SystemCoreClock;
-    *prescale = 0xdeadbeef;
 
-    /* Find prescale value such that the pwm_freq can be acieved */
-    /* Using: fpwm = (fclk / ( (ARR + 1) ( PSC + 1)) */
-    do {
-        *prescale = *prescale == 0xdeadbeef ? 0 : *prescale + 1;
-        *period = fclk / (pwm_freq / (*prescale + 1)) - 1;
-    } while (*period > ARR_MAX);
-
-    if (*prescale >= PRESCALE_MAX) {
-        return STATUS_ERROR;
-    }
-
-    return STATUS_SUCCESS;
-}
 
 /*
  *  Initialize the GPIO pins for the output.  Set them up for their alternate
@@ -139,7 +115,7 @@ status_t init_timer(uint32_t pwm_freq, uint32_t* period) {
     status_t st;
     uint32_t prescale = 0;
 
-    st = calc_vals(pwm_freq, &prescale, period);
+    st = timer_calc_vals(pwm_freq, &prescale, period, SystemCoreClock);
     if (FAIL(st)) {
         return st;
     }
