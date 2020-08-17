@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if ! which wget ; do
+    echo "Must have wget installed!"
+    exit 1
+done
 
 printf "######################################################################\n"
 printf "#   Installing ARM GCC toolchain\n"

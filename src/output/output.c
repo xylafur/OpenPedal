@@ -19,25 +19,22 @@
  */
 #include "stm32f0xx_conf.h"
 
+#include "pwm.h"
+#include "output.h"
+
+#include "timer.h"
 #include "core.h"
 #include "logger.h"
-#include "pwm.h"
 #include "kcb.h"
 
 #include <stdio.h>
 
-#define PWM_FREQ (SystemCoreClock/10)
 #define OUTPUT_DEBUG_LEVEL 1
-
-typedef enum {
-    OUTPUT_PWM,
-    OUTPUT_INVALID,
-} output_t;
 
 /******************************************************************************
  * Globals
  *****************************************************************************/
-uint32_t ouptut_init = 0;
+uint32_t output_inited = 0;
 output_t output_type = OUTPUT_INVALID;
 kcb_t output_buf;
 
@@ -51,13 +48,66 @@ uint32_t output_buffer_empty = 0;
 /******************************************************************************
  * Private Functions
  *****************************************************************************/
+void TIM6_DAC_IRQHandler(void) {
+    uint32_t output_value;
+
+    if (SUCCESS(kcb_read(&output_buf, &output_value))) {
+        pwm_ch_duty(output_value);
+    }
+
+    TIM_ClearFlag(TIM6, 0x1);
+}
+
+static status_t init_interrupt_timer(uint32_t clock_frequency) {
+    status_t st = STATUS_SUCCESS;
+    uint32_t period = 0, prescale = 0;
+
+    st = timer_calc_vals(clock_frequency, &prescale, &period, SystemCoreClock);
+    if (FAIL(st)) {
+        return st;
+    }
+
+    /* Enable the bus */
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM6, ENABLE);
+
+    TIM_TimeBaseInitTypeDef timerInitStructure = {
+        .TIM_Prescaler = prescale,
+        .TIM_CounterMode = TIM_CounterMode_Up,
+        .TIM_Period = period,
+        .TIM_ClockDivision = TIM_CKD_DIV1,
+        .TIM_RepetitionCounter = 0,
+    };
+
+    /* Setup the timer settings (really just the period) */
+    TIM_TimeBaseInit(TIM6, &timerInitStructure);
+
+    /* Enable Interrupts from the timer's perspective */
+    TIM_ITConfig(TIM6, 0x1, ENABLE);
+
+    /* Enable the timer */
+    TIM_Cmd(TIM6, ENABLE);
+
+    /* Enable the timer6 interrupt in the NVIC */
+    NVIC_EnableIRQ(TIM6_DAC_IRQn);
+
+    return st;
+}
 
 /*  Intialize the timer so that the output buffer is polled with the provided
  *  frequency
  */
 static status_t output_init_thread(uint32_t update_frequency) {
-    /* TODO */
-    return STATUS_ERROR;
+    switch (output_type) {
+        case OUTPUT_PWM:
+            /* TODO: Is this a good frequency?? */
+            printf("Initting output pwm timer\n");
+            init_interrupt_timer(update_frequency);
+
+            break;
+        default:
+            return STATUS_ERROR;
+    }
+    return STATUS_SUCCESS;
 }
 
 /*
@@ -98,7 +148,7 @@ status_t output_buffer_write(uint32_t val, uint32_t max) {
     uint32_t converted;
     status_t st;
 
-    if (!ouptut_init) {
+    if (!output_inited) {
         log_warn("Output buffer not initialized\n");
         return STATUS_ERROR;
     }
@@ -111,7 +161,6 @@ status_t output_buffer_write(uint32_t val, uint32_t max) {
     }
 
     st = kcb_write(&output_buf, converted);
-
     if (FAIL(st)) {
 #if OUTPUT_DEBUG_LEVEL == 1
         log_warn("Output buffer full!\n");
@@ -123,8 +172,6 @@ status_t output_buffer_write(uint32_t val, uint32_t max) {
 
     return STATUS_SUCCESS;
 }
-
-
 
 status_t output_thread() {
     status_t st;
@@ -188,7 +235,7 @@ status_t output_init(output_t type, uint32_t update_frequency) {
         return st;
     }
 
-    ouptut_init = 1;
+    output_inited = 1;
 
     return STATUS_SUCCESS;
 }
@@ -198,7 +245,7 @@ status_t output_init(output_t type, uint32_t update_frequency) {
  */
 void output_print_info(uint32_t verbose) {
     printf("Output type: %d\n", output_type);
-    printf("Output Initialized %lu\n", ouptut_init);
+    printf("Output Initialized %lu\n", output_inited);
 
 #if OUTPUT_DEBUG_LEVEL == 2
     printf("Buffer has gotten full %lu\n", output_buffer_full);

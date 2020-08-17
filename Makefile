@@ -13,11 +13,9 @@ SRCS += transform/transform.c
 SRCS += output/output.c
 SRCS += output/pwm.c
 
-
 PROJ_NAME := open_pedal
 
 KESL := $(CURDIR)/KESL
-LDSCRIPT_INC := $(KESL)/mpu/stm32f0/ldscripts
 
 OPENOCD_BOARD_DIR := /usr/share/openocd/scripts/board
 OPENOCD_PROC_FILE := =extra/stm32f0-openocd.cfg
@@ -36,37 +34,33 @@ ROOT=$(shell pwd)
 
 CFLAGS +=   -I ./src/include/
 
-MPU_BASE := $(KESL)/mpu
+MPU_BASE := $(KESL)/mpu/stm32f0
 CORE_BASE := $(KESL)/core
 LIB_BASE := $(KESL)/lib/stm32f0
 
-MPU_INCLUDE := $(MPU_BASE)/stm32f0/include
+MPU_INCLUDE := $(MPU_BASE)/include
 CORE_INCLUDE := $(CORE_BASE)/include
-LIB_INCLUDE := $(LIB_BASE)/STM32F0xx_StdPeriph_Driver/include
+LIB_INCLUDE := $(LIB_BASE)
+STD_PERIPH_INCLUDE := $(LIB_BASE)/STM32F0xx_StdPeriph_Driver/include
 CPU_INCLUDE := $(KESL)/cpu
 
-KESL_INCLUDE = -I$(MPU_INCLUDE) -I$(CORE_INCLUDE) -I$(LIB_INCLUDE) -I$(CPU_INCLUDE)
+KESL_INCLUDE = -I$(MPU_INCLUDE) -I$(CORE_INCLUDE) -I$(LIB_INCLUDE) \
+			   -I$(CPU_INCLUDE) -I$(STD_PERIPH_INCLUDE)
 
-MPU_OBJS = $(MPU_BASE)/objs/%.o
-CORE_OBJS = $(CORE_BASE)/objs/%.o
-LIB_OBJS = $(LIB_BASE)/objs/%.o
+MPU_OBJS = $(shell find $(MPU_BASE)/objs/ -name *.o)
+CORE_OBJS = $(shell find $(CORE_BASE)/objs/ -name *.o)
+LIB_OBJS = $(shell find $(LIB_BASE)/objs/ -name *.o)
 
 KESL_OBJS = $(MPU_OBJS) $(CORE_OBJS) $(LIB_OBJS)
 
+LINKER_DIR := $(MPU_BASE)/ldscripts
+LDSCRIPT_INC := $(LINKER_DIR)
+LINKER_SCRIPT := $(LINKER_DIR)/stm32f0.ld
 
-OBJS = $(SRCS:.c=.o)
-
-# Kesl Core
-SRCS += kesl/core/logger.c
-SRCS += kesl/core/syscalls.c
-SRCS += kesl/core/kcb.c
-
-# Kesl Library / System Config / Startup
-SRCS += kesl/mpu/stm32f0/system_stm32f0xx.c
-SRCS += ./kesl/mpu/stm32f0/startup_stm32f0xx.s
 
 
 
+OBJS = $(SRCS:.c=.o)
 
 ###################################################
 
@@ -75,12 +69,15 @@ SRCS += ./kesl/mpu/stm32f0/startup_stm32f0xx.s
 all: kesl proj
 
 kesl:
+	@echo $(CURDIR)
+	@echo $(MPU_BASE)
+	@echo $(KESL_OBJS)
 	$(MAKE) --directory=KESL
 
 proj: 	$(PROJ_NAME).bin
 
 $(PROJ_NAME).elf: $(SRCS)
-	$(CC) $(CFLAGS) $(KESL_INCLUDE) $(KESL_OBJS) $^ -o $@ -L$(STD_PERIPH_LIB) -lstm32f0 -L$(LDSCRIPT_INC) -Tstm32f0.ld
+	$(CC) $(CFLAGS) $(KESL_INCLUDE) $(KESL_OBJS) $^ -o $@ -L$(STD_PERIPH_LIB) -lstm32f0 -L$(LDSCRIPT_INC) -T$(LINKER_SCRIPT)
 
 $(PROJ_NAME).bin: $(PROJ_NAME).elf
 	$(OBJCOPY) -O ihex $(PROJ_NAME).elf $(PROJ_NAME).hex

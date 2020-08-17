@@ -5,13 +5,13 @@
 #include "core.h"
 #include "pwm.h"
 #include "transform.h"
+#include "output.h"
 #include "cli.h"
 
 static uint32_t do_change = 0;
 
 #define NUM_SAMPLES 128
 #define SYSTICK_FREQ (NUM_SAMPLES * 440)
-#define GENERATE_FREQUENCY (SystemCoreClock/100)
 
 // TODO: Going to need to enter critical section for ADC and systick
 void SysTick_Handler(void) {
@@ -21,7 +21,7 @@ void SysTick_Handler(void) {
 int main(void)
 {
     status_t st;
-    uint32_t val = 0, ii = 0;
+    uint32_t val = 0, ii = 0, max = 256;
     uint32_t systick_clicks = SystemCoreClock / SYSTICK_FREQ;
 
     init_usart();
@@ -36,19 +36,20 @@ int main(void)
         DEBUG();
     }
 
-    st = pwm_init(SystemCoreClock/10);
+    st = output_init(OUTPUT_PWM, SystemCoreClock/200);
     if (FAIL(st)){
         DEBUG();
     }
 
     while(1) {
+
         if (!((ii++)%2)) {
             continue;
         }
 
         if (do_change) {
             if (SUCCESS(get_value(&val))) {
-                pwm_ch_duty(val);
+                st = output_buffer_write(val, max);
             }
             do_change = 0;
         }
