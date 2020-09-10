@@ -31,7 +31,7 @@ PROJ_NAME := open_pedal
 CFLAGS +=   -I ./src/include/
 
 OPENOCD_BOARD_DIR := /usr/share/openocd/scripts/board
-OPENOCD_PROC_FILE := =extra/stm32f0-openocd.cfg
+OPENOCD_PROC_FILE := extra/stm32f0-openocd.cfg
 
 ###############################################################################
 # Everything that comes from KESL
