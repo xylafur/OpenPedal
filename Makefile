@@ -16,15 +16,13 @@ export CFLAGS += --specs=nano.specs
 
 ###############################################################################
 # Open Pedal source files and local includes
-vpath %.c src
+SRCS = src/main.c
+SRCS += src/cli.c
 
-SRCS = main.c
-SRCS += cli.c
+SRCS += src/transform/transform.c
 
-SRCS += transform/transform.c
-
-SRCS += output/output.c
-SRCS += output/pwm.c
+SRCS += src/output/output.c
+SRCS += src/output/pwm.c
 
 PROJ_NAME := open_pedal
 
@@ -69,12 +67,14 @@ OBJS = $(SRCS:.c=.o)
 ###################################################
 
 .PHONY: proj kesl
-all: kesl proj
+all: proj
 
 kesl:
 	$(MAKE) --directory=KESL
 
 proj: 	$(PROJ_NAME).bin
+
+$(SRCS): kesl
 
 $(PROJ_NAME).elf: $(SRCS)
 	$(CC) $(CFLAGS) $(KESL_INCLUDE) $(KESL_OBJS) $^ -o $@  -L$(LDSCRIPT_INC) -T$(LINKER_SCRIPT)
@@ -92,11 +92,11 @@ debug: program
 	$(GDB) -x extra/gdb_cmds $(PROJ_NAME).elf
 
 clean:
-	find ./ -name '*~' | xargs rm -f
-	rm -f *.o
-	rm -f $(PROJ_NAME).elf
-	rm -f $(PROJ_NAME).hex
-	rm -f $(PROJ_NAME).bin
-	rm -f $(PROJ_NAME).map
-	rm -f $(PROJ_NAME).lst
-	$(MAKE) --directory=KESL clean
+	@find ./ -name '*~' | xargs rm -f
+	@rm -f *.o
+	@rm -f $(PROJ_NAME).elf
+	@rm -f $(PROJ_NAME).hex
+	@rm -f $(PROJ_NAME).bin
+	@rm -f $(PROJ_NAME).map
+	@rm -f $(PROJ_NAME).lst
+	@$(MAKE) --directory=KESL clean
